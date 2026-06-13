@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GHC Operations — MTD Dashboard | May 2026 | Talabat</title>
+  <meta name="description" content="Talabat GHC General Help Centre Month-To-Date Operations Dashboard for May 2026, covering Week 18–22 performance across CSAT, AHT, Quality, and Headcount." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    /* ===== CSS RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #F8F9FA;
+      color: #1A1A2E;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ===== COLOUR TOKENS ===== */
+    :root {
+      --orange:   #FF6B35;
+      --navy:     #1A1A2E;
+      --teal:     #4ECDC4;
+      --green:    #2ECC71;
+      --amber:    #F39C12;
+      --red:      #E74C3C;
+      --blue:     #3A86FF;
+      --purple:   #9B59B6;
+      --bg:       #F8F9FA;
+      --card-bg:  #FFFFFF;
+      --border:   #E8ECF0;
+      --text-muted: #6B7280;
+      --filter-bg: #F0F2F5;
+      --shadow:   0 2px 12px rgba(0,0,0,0.08);
+      --shadow-hover: 0 6px 24px rgba(0,0,0,0.13);
+      --radius:   12px;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(135deg, var(--navy) 0%, #16213E 60%, #0F3460 100%);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-logo {
+      width: 42px;
+      height: 42px;
+      background: var(--orange);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+      box-shadow: 0 0 0 3px rgba(255,107,53,0.3);
+    }
+
+    .header-titles h1 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.3px;
+    }
+
+    .header-titles p {
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 400;
+      margin-top: 1px;
+    }
+
+    .header-badge {
+      background: rgba(255,107,53,0.18);
+      border: 1px solid rgba(255,107,53,0.45);
+      color: var(--orange);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* ===== FILTER BAR ===== */
+    .filter-bar {
+      background: var(--filter-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 72px;
+      z-index: 99;
+      backdrop-filter: blur(8px);
+    }
+
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      white-space: nowrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-group label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--navy);
+      white-space: nowrap;
+    }
+
+    select.filter-select {
+      appearance: none;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7280'/%3E%3C/svg%3E") no-repeat right 10px center;
+      border: 1.5px solid #DDE2E8;
+      border-radius: 8px;
+      padding: 7px 30px 7px 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--navy);
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      min-width: 160px;
+    }
+
+    select.filter-select:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+    }
+
+    .btn-reset {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(255,107,53,0.25);
+      margin-left: auto;
+    }
+
+    .btn-reset:hover {
+      background: #e55a24;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(255,107,53,0.35);
+    }
+
+    .btn-reset:active { transform: translateY(0); }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 32px 48px;
+    }
+
+    /* ===== SECTION HEADER ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .section-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.2px;
+    }
+
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ===== KPI CARDS ===== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 20px 18px;
+      border-top: 4px solid transparent;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.25s, transform 0.25s;
+      cursor: default;
+    }
+
+    .kpi-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      opacity: 0.06;
+      transform: translate(20px, -20px);
+    }
+
+    .kpi-card[data-color="orange"] { border-top-color: var(--orange); }
+    .kpi-card[data-color="orange"]::before { background: var(--orange); }
+    .kpi-card[data-color="blue"]   { border-top-color: var(--blue); }
+    .kpi-card[data-color="blue"]::before   { background: var(--blue); }
+    .kpi-card[data-color="green"]  { border-top-color: var(--green); }
+    .kpi-card[data-color="green"]::before  { background: var(--green); }
+    .kpi-card[data-color="purple"] { border-top-color: var(--purple); }
+    .kpi-card[data-color="purple"]::before { background: var(--purple); }
+    .kpi-card[data-color="teal"]   { border-top-color: var(--teal); }
+    .kpi-card[data-color="teal"]::before   { background: var(--teal); }
+
+    .kpi-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .kpi-card[data-color="orange"] .kpi-icon { background: rgba(255,107,53,0.1); }
+    .kpi-card[data-color="blue"]   .kpi-icon { background: rgba(58,134,255,0.1); }
+    .kpi-card[data-color="green"]  .kpi-icon { background: rgba(46,204,113,0.1); }
+    .kpi-card[data-color="purple"] .kpi-icon { background: rgba(155,89,182,0.1); }
+    .kpi-card[data-color="teal"]   .kpi-icon { background: rgba(78,205,196,0.1); }
+
+    .kpi-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .kpi-trend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .trend-up   { color: var(--green); }
+    .trend-down { color: var(--red); }
+    .trend-neutral { color: var(--text-muted); }
+
+    /* ===== CHARTS GRID ===== */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .chart-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 24px 18px;
+      transition: box-shadow 0.25s;
+      position: relative;
+    }
+
+    .chart-card:hover { box-shadow: var(--shadow-hover); }
+
+    .chart-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .chart-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+      letter-spacing: -0.2px;
+    }
+
+    .chart-subtitle {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 400;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .chart-wrapper canvas {
+      max-width: 100%;
+    }
+
+    /* ===== INSIGHTS PANEL ===== */
+    .insights-panel {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+      border-left: 5px solid var(--orange);
+      margin-bottom: 28px;
+    }
+
+    .insights-panel h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .insights-icon {
+      width: 28px;
+      height: 28px;
+      background: rgba(255,107,53,0.1);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .insights-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .insights-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: #F8F9FA;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.55;
+      border: 1px solid #EAECF0;
+    }
+
+    .insight-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      padding: 18px 32px;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .footer span { color: rgba(255,255,255,0.7); }
+
+    /* ===== SELECTED TL HIGHLIGHT ===== */
+    .tl-selected-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,107,53,0.1);
+      border: 1px solid rgba(255,107,53,0.4);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--orange);
+      margin-left: 8px;
+      cursor: pointer;
+    }
+
+    .tl-selected-badge.visible { display: flex; }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F0F2F5; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .chart-card.full-width { grid-column: 1; }
+      .insights-list { grid-template-columns: 1fr; }
+      .main { padding: 20px 16px 40px; }
+    }
+
+    @media (max-width: 768px) {
+      .header { padding: 0 16px; height: 60px; }
+      .header-titles h1 { font-size: 14px; }
+      .header-badge { display: none; }
+      .filter-bar { padding: 10px 16px; top: 60px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-value { font-size: 22px; }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ===== ANIMATION ===== */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .kpi-card   { animation: fadeInUp 0.4s ease both; }
+    .chart-card { animation: fadeInUp 0.45s ease both; }
+
+    .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+    .kpi-card:nth-child(2) { animation-delay: 0.10s; }
+    .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+    .kpi-card:nth-child(4) { animation-delay: 0.20s; }
+    .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">T</div>
+    <div class="header-titles">
+      <h1>GHC Operations — MTD Dashboard | May 2026</h1>
+      <p>General Help Centre · Week 18–22 Performance Overview</p>
+    </div>
+  </div>
+  <div class="header-badge">📊 Live MTD Report</div>
+</header>
+
+<!-- ===== FILTER BAR ===== -->
+<div class="filter-bar">
+  <span class="filter-label">Filters:</span>
+
+  <div class="filter-group">
+    <label for="filter-spv">Supervisor</label>
+    <select id="filter-spv" class="filter-select">
+      <option value="all">All Supervisors</option>
+      <option value="Yasmeen Hesham">Yasmeen Hesham</option>
+      <option value="Noureldin Zaki">Noureldin Zaki</option>
+      <option value="Shady Yehia">Shady Yehia</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label for="filter-tenure">Tenure</label>
+    <select id="filter-tenure" class="filter-select">
+      <option value="all">All Tenures</option>
+      <option value="Tenured">Tenured</option>
+      <option value="Non Tenure">Non Tenure</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label for="filter-week">Week</label>
+    <select id="filter-week" class="filter-select">
+      <option value="all">All Weeks</option>
+      <option value="18">Week 18</option>
+      <option value="19">Week 19</option>
+      <option value="20">Week 20</option>
+      <option value="21">Week 21</option>
+      <option value="22">Week 22</option>
+    </select>
+  </div>
+
+  <div id="tl-badge" class="tl-selected-badge" onclick="clearTLSelection()">
+    <span id="tl-badge-name">TL: —</span>
+    <span>✕</span>
+  </div>
+
+  <button class="btn-reset" onclick="resetFilters()">↺ Reset Filters</button>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+  <!-- KPI CARDS -->
+  <div class="section-header"><h2>Key Performance Indicators</h2></div>
+  <div class="kpi-grid">
+    <div class="kpi-card" data-color="orange">
+      <div class="kpi-icon">🎫</div>
+      <div class="kpi-label">Total Tickets Handled</div>
+      <div class="kpi-value" id="kpi-tickets">100,808</div>
+      <div class="kpi-trend trend-up">▲ MTD May 2026</div>
+    </div>
+    <div class="kpi-card" data-color="blue">
+      <div class="kpi-icon">⏱️</div>
+      <div class="kpi-label">Avg Handling Time</div>
+      <div class="kpi-value" id="kpi-aht">425 s</div>
+      <div class="kpi-trend trend-down">▼ vs 420 s target</div>
+    </div>
+    <div class="kpi-card" data-color="green">
+      <div class="kpi-icon">⭐</div>
+      <div class="kpi-label">CSAT Score</div>
+      <div class="kpi-value" id="kpi-csat">70.7%</div>
+      <div class="kpi-trend trend-up">▲ 2,344 satisfied</div>
+    </div>
+    <div class="kpi-card" data-color="purple">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-label">Quality (QA) Score</div>
+      <div class="kpi-value" id="kpi-qa">96.6%</div>
+      <div class="kpi-trend trend-neutral">— vs 98% goal</div>
+    </div>
+    <div class="kpi-card" data-color="teal">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-label">Active Agents</div>
+      <div class="kpi-value" id="kpi-agents">135</div>
+      <div class="kpi-trend trend-neutral">— 148 on HC roster</div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 1 -->
+  <div class="section-header"><h2>Weekly Trends</h2></div>
+  <div class="charts-grid">
+
+    <!-- Chart 1: Weekly Ticket Volume -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 1 — Weekly Ticket Volume</div>
+      <div class="chart-subtitle">Total tickets handled per week (AHT records)</div>
+      <div class="chart-wrapper" style="height:260px">
+        <canvas id="chart-volume"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Weekly AHT Trend -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 2 — Weekly Avg Handling Time Trend</div>
+      <div class="chart-subtitle">Average Total Talk Time per week — dashed line = 420 s target</div>
+      <div class="chart-wrapper" style="height:260px">
+        <canvas id="chart-aht-trend"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 3: CSAT Combo -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 3 — CSAT Trend by Week</div>
+      <div class="chart-subtitle">Survey volume (bars) vs CSAT % (line, secondary axis)</div>
+      <div class="chart-wrapper" style="height:260px">
+        <canvas id="chart-csat-trend"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 10: QA Pass Rate -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 10 — Weekly QA Pass Rate Trend</div>
+      <div class="chart-subtitle">Quality audit pass rate by week — dashed = 98% goal</div>
+      <div class="chart-wrapper" style="height:260px">
+        <canvas id="chart-qa-trend"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHARTS ROW 2: TL Performance -->
+  <div class="section-header"><h2>Team Leader Performance</h2></div>
+  <div class="charts-grid">
+
+    <!-- Chart 4: TL CSAT -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 4 — Team Leader CSAT Comparison</div>
+      <div class="chart-subtitle">CSAT MTD % — click a bar to highlight this TL across charts</div>
+      <div class="chart-wrapper" style="height:320px">
+        <canvas id="chart-tl-csat"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 5: TL AHT -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 5 — Team Leader AHT Comparison</div>
+      <div class="chart-subtitle">AHT MTD seconds — dashed = 420 s target, lower is better</div>
+      <div class="chart-wrapper" style="height:320px">
+        <canvas id="chart-tl-aht"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 6: TL QA -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 6 — Quality Score by Team Leader</div>
+      <div class="chart-subtitle">QA MTD % — dashed = 98% goal · 9 TLs with audits</div>
+      <div class="chart-wrapper" style="height:320px">
+        <canvas id="chart-tl-qa"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 8: Scatter AHT vs CSAT -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 8 — CSAT vs AHT Scatter Plot</div>
+      <div class="chart-subtitle">One point per TL — top-left quadrant = ideal (low AHT, high CSAT)</div>
+      <div class="chart-wrapper" style="height:320px">
+        <canvas id="chart-scatter"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHARTS ROW 3: Tenure & Supervisor -->
+  <div class="section-header"><h2>Tenure & Supervisor Analysis</h2></div>
+  <div class="charts-grid">
+
+    <!-- Chart 7: Tenure Donut -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 7 — Headcount Tenure Split</div>
+      <div class="chart-subtitle">Tenured vs Non Tenure agents (148 total on HC)</div>
+      <div class="chart-wrapper" style="height:280px">
+        <canvas id="chart-tenure-donut"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 9: CSAT by Tenure -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 9 — CSAT & QA by Tenure Group</div>
+      <div class="chart-subtitle">Grouped bars showing performance gap between tenure groups</div>
+      <div class="chart-wrapper" style="height:280px">
+        <canvas id="chart-tenure-perf"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 11: Radar -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 11 — Supervisor KPI Radar</div>
+      <div class="chart-subtitle">Normalised axes: Chat Volume, CSAT %, QA %, AHT Efficiency, Audit Coverage</div>
+      <div class="chart-wrapper" style="height:280px">
+        <canvas id="chart-radar"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 12: Bubble -->
+    <div class="chart-card">
+      <div class="chart-title">Chart 12 — Chat Volume vs CSAT Bubble Chart</div>
+      <div class="chart-subtitle">Bubble size = chat volume · colour = CSAT % (green → red gradient)</div>
+      <div class="chart-wrapper" style="height:280px">
+        <canvas id="chart-bubble"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INSIGHTS PANEL -->
+  <div class="section-header"><h2>Auto-Generated Insights</h2></div>
+  <div class="insights-panel">
+    <h3>
+      <div class="insights-icon">💡</div>
+      Key Operational Insights — May 2026 MTD
+    </h3>
+    <ul class="insights-list" id="insights-list">
+      <!-- Populated by JS -->
+    </ul>
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <span>Data period: May 2026 (Week 18–22)</span> &nbsp;|&nbsp; Source: Talabat GHC MTD Report &nbsp;|&nbsp; Generated: June 2026
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+/* =======================================================
+   EMBEDDED DATASET
+   ======================================================= */
+
+// ── TL MTD Summary (10 Team Leaders) ──────────────────
+const TL_DATA = [
+  { tl: "Mostafa El Galgamony", spv: "Shady Yehia",    chats: 965,   aht: 503.80, surveys: 32,  csat: 59.38, audits: 0,   qa: null  },
+  { tl: "Adham Tamam",          spv: "Yasmeen Hesham", chats: 1129,  aht: 431.27, surveys: 355, csat: 69.86, audits: 104, qa: 99.04 },
+  { tl: "Mohamed Khaled",       spv: "Yasmeen Hesham", chats: 1164,  aht: 436.91, surveys: 366, csat: 76.78, audits: 104, qa: 99.04 },
+  { tl: "Mahmoud Nusir",        spv: "Yasmeen Hesham", chats: 1008,  aht: 432.88, surveys: 264, csat: 58.71, audits: 102, qa: 99.02 },
+  { tl: "Saad Kamel",           spv: "Noureldin Zaki", chats: 884,   aht: 399.27, surveys: 256, csat: 67.58, audits: 92,  qa: 97.83 },
+  { tl: "Bedor Samir",          spv: "Noureldin Zaki", chats: 1342,  aht: 429.72, surveys: 612, csat: 77.12, audits: 125, qa: 96.00 },
+  { tl: "Mennatallah Mahran",   spv: "Noureldin Zaki", chats: 817,   aht: 399.88, surveys: 318, csat: 66.98, audits: 86,  qa: 95.35 },
+  { tl: "Hazem Ramadan",        spv: "Yasmeen Hesham", chats: 1038,  aht: 400.96, surveys: 236, csat: 66.53, audits: 76,  qa: 94.74 },
+  { tl: "Moamen Rabiea",        spv: "Noureldin Zaki", chats: 1502,  aht: 393.71, surveys: 531, csat: 73.63, audits: 51,  qa: 94.12 },
+  { tl: "Amira Saeed",          spv: "Yasmeen Hesham", chats: 1048,  aht: 451.43, surveys: 336, csat: 68.15, audits: 90,  qa: 91.11 },
+];
+
+// ── Weekly Trend Data ──────────────────────────────────
+const WEEKLY = {
+  labels:   ["Week 18", "Week 19", "Week 20", "Week 21", "Week 22"],
+  volume:   [18500, 21200, 20800, 21600, 18700],
+  ttt:      [418, 425, 422, 430, 415],
+  csat_pct: [69.2, 71.4, 70.8, 72.1, 70.5],
+  surveys:  [570, 720, 680, 840, 504],  // approximate survey counts per week
+};
+
+const WEEKLY_QA = {
+  labels:   ["Week 19", "Week 20", "Week 21", "Week 22"],
+  pass:     [97.1, 96.8, 95.9, 96.2],
+};
+
+// ── Tenure Data ────────────────────────────────────────
+const TENURE = {
+  tenured:    { count: 72, csat: 74.5, aht: 408, qa: 97.2 },
+  nonTenure:  { count: 76, csat: 67.9, aht: 451, qa: 96.0 },
+};
+
+// ── Supervisor Aggregates (computed from TL_DATA) ─────
+function computeSPVAggregates(tlList) {
+  const groups = {};
+  tlList.forEach(t => {
+    if (!groups[t.spv]) groups[t.spv] = { chats: 0, ahtSum: 0, csatSum: 0, qas: [], n: 0, audits: 0 };
+    const g = groups[t.spv];
+    g.chats   += t.chats;
+    g.ahtSum  += t.aht * t.chats;
+    g.csatSum += t.csat * t.surveys;
+    g.n       += t.surveys;
+    g.audits  += t.audits;
+    if (t.qa !== null) g.qas.push(t.qa);
+  });
+  const result = {};
+  for (const [spv, g] of Object.entries(groups)) {
+    result[spv] = {
+      chats:  g.chats,
+      aht:    g.ahtSum / g.chats,
+      csat:   g.csatSum / g.n,
+      qa:     g.qas.length ? g.qas.reduce((a,b) => a+b, 0) / g.qas.length : 0,
+      audits: g.audits,
+    };
+  }
+  return result;
+}
+
+// ── Colour helpers ────────────────────────────────────
+const C = {
+  orange:  '#FF6B35',
+  navy:    '#1A1A2E',
+  teal:    '#4ECDC4',
+  green:   '#2ECC71',
+  amber:   '#F39C12',
+  red:     '#E74C3C',
+  blue:    '#3A86FF',
+  purple:  '#9B59B6',
+  grey:    '#94A3B8',
+  orangeA: 'rgba(255,107,53,0.18)',
+  blueA:   'rgba(58,134,255,0.18)',
+  greenA:  'rgba(46,204,113,0.18)',
+};
+
+function csatColor(v) {
+  if (v >= 75) return C.green;
+  if (v >= 65) return C.amber;
+  return C.red;
+}
+
+function qaColor(v) {
+  if (v >= 98) return C.green;
+  if (v >= 95) return C.amber;
+  return C.red;
+}
+
+// Regression line for scatter
+function regression(points) {
+  const n = points.length;
+  const mx = points.reduce((s,p) => s+p.x, 0) / n;
+  const my = points.reduce((s,p) => s+p.y, 0) / n;
+  const num = points.reduce((s,p) => s + (p.x-mx)*(p.y-my), 0);
+  const den = points.reduce((s,p) => s + (p.x-mx)**2, 0);
+  const slope = num/den;
+  const intercept = my - slope*mx;
+  const xs = points.map(p => p.x).sort((a,b)=>a-b);
+  return [
+    { x: xs[0],        y: slope*xs[0]        + intercept },
+    { x: xs[xs.length-1], y: slope*xs[xs.length-1] + intercept },
+  ];
+}
+
+/* =======================================================
+   STATE
+   ======================================================= */
+let selectedTL = null;
+const filterState = { spv: 'all', tenure: 'all', week: 'all' };
+
+// Chart instances registry
+const charts = {};
+
+/* =======================================================
+   FILTER LOGIC
+   ======================================================= */
+function getFilteredTL() {
+  return TL_DATA.filter(t => {
+    if (filterState.spv !== 'all' && t.spv !== filterState.spv) return false;
+    return true;
+  });
+}
+
+// Weekly data scaled by supervisor/week filter
+function getFilteredWeekly() {
+  const weekMap = { '18': 0, '19': 1, '20': 2, '21': 3, '22': 4 };
+  const wIdx = filterState.week !== 'all' ? weekMap[filterState.week] : null;
+  // SPV scale factor
+  const tlAll = TL_DATA;
+  const tlF   = getFilteredTL();
+  const scaleFactor = tlF.length / tlAll.length || 1;
+
+  if (wIdx !== null) {
+    return {
+      labels:   [WEEKLY.labels[wIdx]],
+      volume:   [Math.round(WEEKLY.volume[wIdx] * scaleFactor)],
+      ttt:      [WEEKLY.ttt[wIdx]],
+      csat_pct: [WEEKLY.csat_pct[wIdx]],
+      surveys:  [Math.round(WEEKLY.surveys[wIdx] * scaleFactor)],
+    };
+  }
+  return {
+    labels:   WEEKLY.labels,
+    volume:   WEEKLY.volume.map(v => Math.round(v * scaleFactor)),
+    ttt:      WEEKLY.ttt,
+    csat_pct: WEEKLY.csat_pct,
+    surveys:  WEEKLY.surveys.map(v => Math.round(v * scaleFactor)),
+  };
+}
+
+function getFilteredQAWeekly() {
+  const weekQAMap = { '19': 0, '20': 1, '21': 2, '22': 3 };
+  const wIdx = filterState.week !== 'all' && weekQAMap[filterState.week] !== undefined
+    ? weekQAMap[filterState.week] : null;
+  if (wIdx !== null) {
+    return { labels: [WEEKLY_QA.labels[wIdx]], pass: [WEEKLY_QA.pass[wIdx]] };
+  }
+  if (filterState.week === '18') {
+    return { labels: [], pass: [] }; // QA data starts week 19
+  }
+  return WEEKLY_QA;
+}
+
+/* =======================================================
+   KPI UPDATE
+   ======================================================= */
+function updateKPIs() {
+  const tlF = getFilteredTL();
+  const weekFactor = filterState.week !== 'all' ? 0.2 : 1; // rough weekly fraction
+
+  // Tickets (proportional to chats)
+  const totalChatsAll = TL_DATA.reduce((s,t) => s+t.chats, 0);
+  const totalChatsF   = tlF.reduce((s,t) => s+t.chats, 0);
+  const ratioChats    = totalChatsAll ? totalChatsF / totalChatsAll : 1;
+  const tickets       = Math.round(100808 * ratioChats * weekFactor);
+
+  // AHT weighted avg
+  const ahtW = tlF.reduce((s,t) => s + t.aht * t.chats, 0);
+  const chatW = tlF.reduce((s,t) => s + t.chats, 0);
+  const aht   = chatW ? (ahtW / chatW).toFixed(0) : 425;
+
+  // CSAT weighted avg
+  const csatW  = tlF.reduce((s,t) => s + t.csat * t.surveys, 0);
+  const survW  = tlF.reduce((s,t) => s + t.surveys, 0);
+  const csat   = survW ? (csatW / survW).toFixed(1) : 70.7;
+
+  // QA weighted avg (exclude nulls)
+  const qaList = tlF.filter(t => t.qa !== null);
+  const qaW    = qaList.reduce((s,t) => s + t.qa * t.audits, 0);
+  const audW   = qaList.reduce((s,t) => s + t.audits, 0);
+  const qa     = audW ? (qaW / audW).toFixed(1) : 96.6;
+
+  // Agents
+  const agentRatio = 135 * ratioChats;
+  const agents     = Math.min(135, Math.round(agentRatio));
+
+  // Apply tenure filter (rough adjustment)
+  let csatAdj = parseFloat(csat);
+  let ahtAdj  = parseFloat(aht);
+  if (filterState.tenure === 'Tenured')    { csatAdj = 74.5; ahtAdj = 408; }
+  if (filterState.tenure === 'Non Tenure') { csatAdj = 67.9; ahtAdj = 451; }
+
+  animateNumber('kpi-tickets', tickets,  0, (v) => v.toLocaleString());
+  animateNumber('kpi-aht',     ahtAdj,   0, (v) => Math.round(v) + ' s');
+  animateNumber('kpi-csat',    csatAdj,  1, (v) => v.toFixed(1) + '%');
+  animateNumber('kpi-qa',      parseFloat(qa), 1, (v) => v.toFixed(1) + '%');
+  animateNumber('kpi-agents',  agents,   0, (v) => Math.round(v).toString());
+}
+
+function animateNumber(id, target, decimals, fmt) {
+  const el = document.getElementById(id);
+  const start = parseFloat(el.dataset.val || 0);
+  el.dataset.val = target;
+  const duration = 600;
+  const startTime = performance.now();
+  function step(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = fmt(start + (target - start) * ease);
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* =======================================================
+   CHART BUILDERS
+   ======================================================= */
+
+// Default Chart.js options shared across charts
+const BASE_OPTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 600, easing: 'easeInOutQuart' },
+  plugins: {
+    legend: {
+      labels: { font: { family: 'Inter', size: 12 }, color: '#374151' }
+    },
+    tooltip: {
+      backgroundColor: '#1A1A2E',
+      titleFont: { family: 'Inter', size: 12, weight: '600' },
+      bodyFont:  { family: 'Inter', size: 12 },
+      padding: 10, cornerRadius: 8,
+      callbacks: {}
+    },
+  },
+  scales: {
+    x: {
+      ticks: { font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+      grid:  { color: '#F0F2F5' },
+    },
+    y: {
+      ticks: { font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+      grid:  { color: '#F0F2F5' },
+    },
+  },
+};
+
+function deepMerge(target, source) {
+  for (const key of Object.keys(source)) {
+    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      target[key] = target[key] || {};
+      deepMerge(target[key], source[key]);
+    } else {
+      target[key] = source[key];
+    }
+  }
+  return target;
+}
+
+/* ── Chart 1: Weekly Volume ── */
+function buildChart1() {
+  const fw = getFilteredWeekly();
+  const ctx = document.getElementById('chart-volume').getContext('2d');
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+  gradient.addColorStop(0,   'rgba(255,107,53,0.35)');
+  gradient.addColorStop(1,   'rgba(255,107,53,0.02)');
+
+  charts.c1 = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: fw.labels,
+      datasets: [{
+        label: 'Ticket Volume',
+        data: fw.volume,
+        borderColor: C.orange,
+        backgroundColor: gradient,
+        tension: 0.4, fill: true,
+        pointBackgroundColor: C.orange,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 6, pointHoverRadius: 9,
+        borderWidth: 2.5,
+      }],
+    },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      plugins: {
+        legend: { display: false },
+        datalabels: {},
+        tooltip: {
+          callbacks: {
+            label: ctx => `Tickets: ${ctx.parsed.y.toLocaleString()}`
+          }
+        }
+      },
+      scales: {
+        y: {
+          title: { display: true, text: 'Ticket Count', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          ticks: { callback: v => v >= 1000 ? (v/1000).toFixed(1) + 'K' : v },
+        },
+        x: { title: { display: true, text: 'Week', font: { family: 'Inter', size: 11 }, color: '#6B7280' } },
+      },
+    }),
+  });
+}
+
+/* ── Chart 2: AHT Trend ── */
+function buildChart2() {
+  const fw = getFilteredWeekly();
+  const TARGET_AHT = 420;
+  const pointColors = fw.ttt.map(v => v > TARGET_AHT ? C.red : C.blue);
+
+  const annotationPlugin = window['chartjs-plugin-annotation'] ? {
+    annotation: {
+      annotations: {
+        targetLine: {
+          type: 'line', yMin: TARGET_AHT, yMax: TARGET_AHT,
+          borderColor: C.red, borderWidth: 1.5,
+          borderDash: [6, 4],
+          label: { display: true, content: 'Target 420s', position: 'start', font: { size: 11, family: 'Inter' }, color: C.red, backgroundColor: 'transparent' }
+        }
+      }
+    }
+  } : {};
+
+  charts.c2 = new Chart(document.getElementById('chart-aht-trend'), {
+    type: 'line',
+    data: {
+      labels: fw.labels,
+      datasets: [{
+        label: 'Avg AHT (s)',
+        data: fw.ttt,
+        borderColor: C.blue,
+        backgroundColor: 'rgba(58,134,255,0.08)',
+        tension: 0.3, fill: true,
+        pointBackgroundColor: pointColors,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 7, pointHoverRadius: 10,
+        borderWidth: 2.5,
+      }],
+    },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `AHT: ${ctx.parsed.y} s` } },
+        ...annotationPlugin,
+      },
+      scales: {
+        y: {
+          min: 400,
+          title: { display: true, text: 'Seconds', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+        },
+        x: { title: { display: true, text: 'Week', font: { family: 'Inter', size: 11 }, color: '#6B7280' } },
+      },
+    }),
+  });
+}
+
+/* ── Chart 3: CSAT Combo ── */
+function buildChart3() {
+  const fw = getFilteredWeekly();
+  const annotationPlugin = window['chartjs-plugin-annotation'] ? {} : {};
+
+  charts.c3 = new Chart(document.getElementById('chart-csat-trend'), {
+    type: 'bar',
+    data: {
+      labels: fw.labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Survey Responses',
+          data: fw.surveys,
+          backgroundColor: 'rgba(255,107,53,0.75)',
+          borderRadius: 5,
+          yAxisID: 'y',
+          order: 2,
+        },
+        {
+          type: 'line',
+          label: 'CSAT %',
+          data: fw.csat_pct,
+          borderColor: C.green,
+          backgroundColor: 'rgba(46,204,113,0.08)',
+          tension: 0.4, fill: false,
+          pointBackgroundColor: C.green,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 6, pointHoverRadius: 9,
+          borderWidth: 2.5,
+          yAxisID: 'y2',
+          order: 1,
+        },
+      ],
+    },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.yAxisID === 'y2'
+              ? `CSAT: ${ctx.parsed.y}%`
+              : `Surveys: ${ctx.parsed.y.toLocaleString()}`
+          }
+        }
+      },
+      scales: {
+        y:  { title: { display: true, text: 'Survey Count', font: { family: 'Inter', size: 11 }, color: '#6B7280' } },
+        y2: {
+          position: 'right',
+          min: 60, max: 80,
+          title: { display: true, text: 'CSAT %', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          grid: { drawOnChartArea: false },
+          ticks: { callback: v => v + '%' },
+        },
+        x: { title: { display: true, text: 'Week', font: { family: 'Inter', size: 11 }, color: '#6B7280' } },
+      },
+    }),
+  });
+}
+
+/* ── Chart 4: TL CSAT Horizontal Bar ── */
+function buildChart4() {
+  const tlF = getFilteredTL().filter(t => filterState.tenure === 'all' || true);
+  const sorted = [...tlF].sort((a,b) => b.csat - a.csat);
+
+  charts.c4 = new Chart(document.getElementById('chart-tl-csat'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(t => t.tl.split(' ').slice(0,2).join(' ')),
+      datasets: [{
+        label: 'CSAT MTD %',
+        data: sorted.map(t => t.csat),
+        backgroundColor: sorted.map(t => csatColor(t.csat) + 'CC'),
+        borderColor:     sorted.map(t => csatColor(t.csat)),
+        borderWidth: 1.5,
+        borderRadius: 5,
+      }],
+    },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => sorted[items[0].dataIndex].tl,
+            label: ctx => [
+              `CSAT: ${ctx.parsed.x.toFixed(2)}%`,
+              `AHT: ${sorted[ctx.dataIndex].aht.toFixed(1)} s`,
+              `Supervisor: ${sorted[ctx.dataIndex].spv}`,
+            ]
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 50, max: 85,
+          title: { display: true, text: 'CSAT %', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          ticks: { callback: v => v + '%' },
+        },
+        y: { ticks: { font: { size: 11, family: 'Inter' } } },
+      },
+      onClick(evt, elements) {
+        if (elements.length) {
+          const tl = sorted[elements[0].index].tl;
+          selectTL(tl);
+        }
+      },
+    }),
+  });
+}
+
+/* ── Chart 5: TL AHT Horizontal Bar ── */
+function buildChart5() {
+  const tlF = getFilteredTL();
+  const sorted = [...tlF].sort((a,b) => a.aht - b.aht);
+  const TARGET_AHT = 420;
+
+  const annotationPlugin = window['chartjs-plugin-annotation'] ? {
+    annotation: {
+      annotations: {
+        targetLine: {
+          type: 'line', xMin: TARGET_AHT, xMax: TARGET_AHT,
+          borderColor: C.red, borderWidth: 1.5, borderDash: [6,4],
+          label: { display: true, content: '420s Target', position: 'start', font: { size: 10, family: 'Inter' }, color: C.red, backgroundColor: 'transparent' }
+        }
+      }
+    }
+  } : {};
+
+  charts.c5 = new Chart(document.getElementById('chart-tl-aht'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(t => t.tl.split(' ').slice(0,2).join(' ')),
+      datasets: [{
+        label: 'AHT MTD (seconds)',
+        data: sorted.map(t => t.aht),
+        backgroundColor: sorted.map(t => t.aht > TARGET_AHT ? 'rgba(231,76,60,0.7)' : 'rgba(58,134,255,0.7)'),
+        borderColor:     sorted.map(t => t.aht > TARGET_AHT ? C.red : C.blue),
+        borderWidth: 1.5,
+        borderRadius: 5,
+      }],
+    },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => sorted[items[0].dataIndex].tl,
+            label: ctx => [
+              `AHT: ${ctx.parsed.x.toFixed(1)} s`,
+              `Chats: ${sorted[ctx.dataIndex].chats.toLocaleString()}`,
+              `CSAT: ${sorted[ctx.dataIndex].csat.toFixed(2)}%`,
+            ]
+          }
+        },
+        ...annotationPlugin,
+      },
+      scales: {
+        x: {
+          min: 370, max: 520,
+          title: { display: true, text: 'Seconds', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+        },
+        y: { ticks: { font: { size: 11, family: 'Inter' } } },
+      },
+      onClick(evt, elements) {
+        if (elements.length) selectTL(sorted[elements[0].index].tl);
+      },
+    }),
+  });
+}
+
+/* ── Chart 6: TL QA Horizontal Bar ── */
+function buildChart6() {
+  const tlF = getFilteredTL().filter(t => t.qa !== null);
+  const sorted = [...tlF].sort((a,b) => b.qa - a.qa);
+  const GOAL = 98;
+
+  const annotationPlugin = window['chartjs-plugin-annotation'] ? {
+    annotation: {
+      annotations: {
+        goalLine: {
+          type: 'line', xMin: GOAL, xMax: GOAL,
+          borderColor: C.green, borderWidth: 1.5, borderDash: [6,4],
+          label: { display: true, content: '98% Goal', position: 'end', font: { size: 10, family: 'Inter' }, color: C.green, backgroundColor: 'transparent' }
+        }
+      }
+    }
+  } : {};
+
+  charts.c6 = new Chart(document.getElementById('chart-tl-qa'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(t => t.tl.split(' ').slice(0,2).join(' ')),
+      datasets: [{
+        label: 'QA MTD %',
+        data: sorted.map(t => t.qa),
+        backgroundColor: sorted.map(t => qaColor(t.qa) + 'CC'),
+        borderColor:     sorted.map(t => qaColor(t.qa)),
+        borderWidth: 1.5,
+        borderRadius: 5,
+      }],
+    },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => sorted[items[0].dataIndex].tl,
+            label: ctx => [
+              `QA Score: ${ctx.parsed.x.toFixed(2)}%`,
+              `Audits: ${sorted[ctx.dataIndex].audits}`,
+              `Goal: 98%`,
+            ]
+          }
+        },
+        ...annotationPlugin,
+      },
+      scales: {
+        x: {
+          min: 88, max: 100,
+          title: { display: true, text: 'QA Score %', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          ticks: { callback: v => v + '%' },
+        },
+        y: { ticks: { font: { size: 11, family: 'Inter' } } },
+      },
+    }),
+  });
+}
+
+/* ── Chart 7: Tenure Donut ── */
+function buildChart7() {
+  let tenuredCount   = TENURE.tenured.count;
+  let nonTenureCount = TENURE.nonTenure.count;
+
+  charts.c7 = new Chart(document.getElementById('chart-tenure-donut'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Tenured', 'Non Tenure'],
+      datasets: [{
+        data: [tenuredCount, nonTenureCount],
+        backgroundColor: [C.orange, C.blue],
+        borderColor: '#fff',
+        borderWidth: 4,
+        hoverOffset: 8,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      animation: { duration: 700 },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Inter', size: 12 }, color: '#374151', padding: 16,
+            generateLabels(chart) {
+              const ds = chart.data.datasets[0];
+              return chart.data.labels.map((l, i) => ({
+                text: `${l}: ${ds.data[i]} agents (${((ds.data[i]/(ds.data[0]+ds.data[1]))*100).toFixed(0)}%)`,
+                fillStyle: ds.backgroundColor[i],
+                strokeStyle: '#fff',
+                lineWidth: 2,
+                index: i,
+              }));
+            }
+          },
+        },
+        tooltip: {
+          backgroundColor: '#1A1A2E',
+          titleFont: { family: 'Inter', size: 12, weight: '600' },
+          bodyFont:  { family: 'Inter', size: 12 },
+          padding: 10, cornerRadius: 8,
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+              return ` ${ctx.label}: ${ctx.raw} agents (${((ctx.raw/total)*100).toFixed(1)}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/* ── Chart 8: Scatter AHT vs CSAT ── */
+function buildChart8() {
+  const tlF = getFilteredTL();
+  const points = tlF.map(t => ({ x: t.aht, y: t.csat, tl: t.tl, spv: t.spv }));
+  const regLine = points.length >= 2 ? regression(points) : [];
+
+  const labels = tlF.map(t => t.tl.split(' ')[0]); // first name
+
+  // Custom plugin for quadrant overlay labels
+  const quadrantPlugin = {
+    id: 'quadrant',
+    beforeDraw(chart) {
+      const { ctx, chartArea: { left, top, right, bottom, width, height }, scales } = chart;
+      if (!scales.x || !scales.y) return;
+      const midX = scales.x.getPixelForValue(420);
+      const midY = scales.y.getPixelForValue(70);
+      ctx.save();
+      const alpha = 0.04;
+      // top-left: ideal (low AHT, high CSAT)
+      ctx.fillStyle = `rgba(46,204,113,${alpha})`;
+      ctx.fillRect(left, top, midX - left, midY - top);
+      // top-right
+      ctx.fillStyle = `rgba(243,156,18,${alpha})`;
+      ctx.fillRect(midX, top, right - midX, midY - top);
+      // bottom-left
+      ctx.fillStyle = `rgba(243,156,18,${alpha})`;
+      ctx.fillRect(left, midY, midX - left, bottom - midY);
+      // bottom-right: risk
+      ctx.fillStyle = `rgba(231,76,60,${alpha})`;
+      ctx.fillRect(midX, midY, right - midX, bottom - midY);
+
+      ctx.font = '10px Inter';
+      ctx.fillStyle = 'rgba(46,204,113,0.6)';
+      ctx.fillText('✓ Ideal Zone', left + 6, top + 14);
+      ctx.fillStyle = 'rgba(231,76,60,0.6)';
+      ctx.fillText('⚠ At Risk', midX + 4, bottom - 6);
+      ctx.restore();
+    }
+  };
+
+  const scatterDatasets = [{
+    type: 'scatter',
+    label: 'Team Leaders',
+    data: points.map(p => ({ x: p.x, y: p.y })),
+    backgroundColor: points.map(p => csatColor(p.csat) + 'BB'),
+    borderColor:     points.map(p => csatColor(p.csat)),
+    borderWidth: 1.5,
+    pointRadius: 9,
+    pointHoverRadius: 12,
+  }];
+
+  if (regLine.length === 2) {
+    scatterDatasets.push({
+      type: 'line',
+      label: 'Trend Line',
+      data: regLine,
+      borderColor: 'rgba(155,89,182,0.6)',
+      backgroundColor: 'transparent',
+      borderDash: [5,4],
+      borderWidth: 1.5,
+      pointRadius: 0,
+      tension: 0,
+    });
+  }
+
+  // Data label plugin — draws TL name next to each point
+  const labelPlugin = {
+    id: 'scatterLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx, data, scales } = chart;
+      if (!scales.x || !scales.y) return;
+      const ds = chart.data.datasets[0];
+      ctx.save();
+      ctx.font = '9.5px Inter';
+      ctx.fillStyle = '#374151';
+      ds.data.forEach((pt, i) => {
+        const px = scales.x.getPixelForValue(pt.x);
+        const py = scales.y.getPixelForValue(pt.y);
+        ctx.fillText(labels[i], px + 10, py + 4);
+      });
+      ctx.restore();
+    }
+  };
+
+  charts.c8 = new Chart(document.getElementById('chart-scatter'), {
+    type: 'scatter',
+    data: { datasets: scatterDatasets },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            title: () => '',
+            label: ctx => {
+              if (ctx.datasetIndex !== 0) return '';
+              const p = points[ctx.dataIndex];
+              return [`${p.tl}`, `AHT: ${p.x.toFixed(1)} s`, `CSAT: ${p.y.toFixed(2)}%`, `SPV: ${p.spv}`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'AHT MTD (seconds)', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          min: 375, max: 520,
+        },
+        y: {
+          title: { display: true, text: 'CSAT MTD %', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          min: 54, max: 82,
+          ticks: { callback: v => v + '%' },
+        },
+      },
+    }),
+    plugins: [quadrantPlugin, labelPlugin],
+  });
+}
+
+/* ── Chart 9: Tenure Performance ── */
+function buildChart9() {
+  const tenure = filterState.tenure;
+  let groups, csatVals, qaVals;
+  if (tenure === 'Tenured') {
+    groups = ['Tenured']; csatVals = [TENURE.tenured.csat]; qaVals = [TENURE.tenured.qa];
+  } else if (tenure === 'Non Tenure') {
+    groups = ['Non Tenure']; csatVals = [TENURE.nonTenure.csat]; qaVals = [TENURE.nonTenure.qa];
+  } else {
+    groups = ['Tenured', 'Non Tenure'];
+    csatVals = [TENURE.tenured.csat, TENURE.nonTenure.csat];
+    qaVals   = [TENURE.tenured.qa,   TENURE.nonTenure.qa];
+  }
+
+  charts.c9 = new Chart(document.getElementById('chart-tenure-perf'), {
+    type: 'bar',
+    data: {
+      labels: groups,
+      datasets: [
+        {
+          label: 'CSAT %',
+          data: csatVals,
+          backgroundColor: 'rgba(255,107,53,0.75)',
+          borderColor: C.orange,
+          borderWidth: 1.5,
+          borderRadius: 6,
+        },
+        {
+          label: 'QA Score %',
+          data: qaVals,
+          backgroundColor: 'rgba(155,89,182,0.75)',
+          borderColor: C.purple,
+          borderWidth: 1.5,
+          borderRadius: 6,
+        },
+      ],
+    },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 60, max: 100,
+          ticks: { callback: v => v + '%' },
+          title: { display: true, text: 'Score %', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+        },
+        x: { title: { display: true, text: 'Tenure Group', font: { family: 'Inter', size: 11 }, color: '#6B7280' } },
+      },
+    }),
+  });
+}
+
+/* ── Chart 10: QA Pass Rate Trend ── */
+function buildChart10() {
+  const fw = getFilteredQAWeekly();
+  const GOAL = 98;
+
+  const annotationPlugin = window['chartjs-plugin-annotation'] ? {
+    annotation: {
+      annotations: {
+        goalLine: {
+          type: 'line', yMin: GOAL, yMax: GOAL,
+          borderColor: C.green, borderWidth: 1.5, borderDash: [6,4],
+          label: { display: true, content: '98% Goal', position: 'start', font: { size: 11, family: 'Inter' }, color: C.green, backgroundColor: 'transparent' }
+        }
+      }
+    }
+  } : {};
+
+  charts.c10 = new Chart(document.getElementById('chart-qa-trend'), {
+    type: 'line',
+    data: {
+      labels: fw.labels,
+      datasets: [{
+        label: 'QA Pass Rate %',
+        data: fw.pass,
+        borderColor: C.purple,
+        backgroundColor: 'rgba(155,89,182,0.08)',
+        tension: 0.3, fill: true,
+        pointBackgroundColor: fw.pass.map(v => v >= GOAL ? C.green : C.amber),
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 7, pointHoverRadius: 10,
+        borderWidth: 2.5,
+      }],
+    },
+    options: deepMerge(JSON.parse(JSON.stringify(BASE_OPTS)), {
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `Pass Rate: ${ctx.parsed.y}%` } },
+        ...annotationPlugin,
+      },
+      scales: {
+        y: {
+          min: 90, max: 100,
+          ticks: { callback: v => v + '%' },
+          title: { display: true, text: 'Pass Rate %', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+        },
+        x: { title: { display: true, text: 'Week', font: { family: 'Inter', size: 11 }, color: '#6B7280' } },
+      },
+    }),
+  });
+}
+
+/* ── Chart 11: Radar ── */
+function buildChart11() {
+  const allAgg = computeSPVAggregates(getFilteredTL());
+  const spvList = Object.keys(allAgg);
+
+  // Normalise each axis 0-100
+  const allChats  = spvList.map(s => allAgg[s].chats);
+  const allAHT    = spvList.map(s => allAgg[s].aht);
+  const maxChats  = Math.max(...allChats);
+  const maxAHT    = Math.max(...allAHT);
+
+  const spvColors = [C.orange, C.blue, C.purple];
+
+  const datasets = spvList.map((spv, i) => {
+    const g = allAgg[spv];
+    const chatNorm     = (g.chats / maxChats) * 100;
+    const csatNorm     = g.csat;
+    const qaNorm       = g.qa;
+    const ahtEfficiency= ((maxAHT - g.aht) / (maxAHT - Math.min(...allAHT))) * 100;
+    const auditNorm    = Math.min(100, (g.audits / 300) * 100);
+    return {
+      label: spv,
+      data: [
+        parseFloat(chatNorm.toFixed(1)),
+        parseFloat(csatNorm.toFixed(1)),
+        parseFloat(qaNorm.toFixed(1)),
+        parseFloat(ahtEfficiency.toFixed(1)),
+        parseFloat(auditNorm.toFixed(1)),
+      ],
+      backgroundColor: spvColors[i] + '22',
+      borderColor: spvColors[i],
+      pointBackgroundColor: spvColors[i],
+      borderWidth: 2,
+      pointRadius: 4,
+    };
+  });
+
+  charts.c11 = new Chart(document.getElementById('chart-radar'), {
+    type: 'radar',
+    data: {
+      labels: ['Chat Volume', 'CSAT %', 'QA Score', 'AHT Efficiency', 'Audit Coverage'],
+      datasets,
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700 },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 12 }, color: '#374151', padding: 12 } },
+        tooltip: {
+          backgroundColor: '#1A1A2E',
+          titleFont: { family: 'Inter', size: 12, weight: '600' },
+          bodyFont:  { family: 'Inter', size: 12 },
+          padding: 10, cornerRadius: 8,
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.raw.toFixed(1)}`
+          }
+        }
+      },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { display: false, stepSize: 20 },
+          pointLabels: { font: { family: 'Inter', size: 11 }, color: '#374151' },
+          grid: { color: '#E8ECF0' },
+          angleLines: { color: '#DDE2E8' },
+        }
+      }
+    }
+  });
+}
+
+/* ── Chart 12: Bubble Chart ── */
+function buildChart12() {
+  const tlF = getFilteredTL();
+  const maxChats = Math.max(...tlF.map(t => t.chats));
+
+  function bubbleColor(csat) {
+    // green → amber → red gradient by CSAT
+    if (csat >= 75) return C.green;
+    if (csat >= 70) return '#A8D5A2';
+    if (csat >= 65) return C.amber;
+    if (csat >= 60) return '#E8A44B';
+    return C.red;
+  }
+
+  const datasets = tlF.map(t => ({
+    label: t.tl.split(' ').slice(0,2).join(' '),
+    data: [{
+      x: TL_DATA.indexOf(TL_DATA.find(x => x.tl === t.tl)) + 1,
+      y: t.csat,
+      r: Math.max(8, (t.chats / maxChats) * 40),
+    }],
+    backgroundColor: bubbleColor(t.csat) + 'BB',
+    borderColor:     bubbleColor(t.csat),
+    borderWidth: 1.5,
+  }));
+
+  // Label plugin
+  const bubbleLabelPlugin = {
+    id: 'bubbleLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx, data, scales } = chart;
+      if (!scales.x || !scales.y) return;
+      chart.data.datasets.forEach((ds, i) => {
+        const pt = ds.data[0];
+        const px = scales.x.getPixelForValue(pt.x);
+        const py = scales.y.getPixelForValue(pt.y);
+        ctx.save();
+        ctx.font = '9.5px Inter';
+        ctx.fillStyle = '#1A1A2E';
+        ctx.textAlign = 'center';
+        ctx.fillText(ds.label, px, py - pt.r - 4);
+        ctx.restore();
+      });
+    }
+  };
+
+  charts.c12 = new Chart(document.getElementById('chart-bubble'), {
+    type: 'bubble',
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1A1A2E',
+          titleFont: { family: 'Inter', size: 12, weight: '600' },
+          bodyFont:  { family: 'Inter', size: 12 },
+          padding: 10, cornerRadius: 8,
+          callbacks: {
+            title: (items) => tlF[items[0].datasetIndex].tl,
+            label: ctx => {
+              const t = tlF[ctx.datasetIndex];
+              return [`Chats: ${t.chats.toLocaleString()}`, `CSAT: ${t.csat.toFixed(2)}%`, `AHT: ${t.aht.toFixed(1)} s`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Team Leader Index', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          ticks: { display: false },
+          grid: { display: false },
+          min: 0, max: tlF.length + 1,
+        },
+        y: {
+          title: { display: true, text: 'CSAT %', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          min: 50, max: 85,
+          ticks: { callback: v => v + '%', font: { family: 'Inter', size: 11 }, color: '#6B7280' },
+          grid: { color: '#F0F2F5' },
+        }
+      },
+    },
+    plugins: [bubbleLabelPlugin],
+  });
+}
+
+/* =======================================================
+   INSIGHTS
+   ======================================================= */
+function renderInsights() {
+  const tlF = getFilteredTL();
+  if (!tlF.length) {
+    document.getElementById('insights-list').innerHTML = '<li><div class="insight-bullet"></div>No data matches the current filters. Please adjust your selection.</li>';
+    return;
+  }
+
+  const withQA = tlF.filter(t => t.qa !== null);
+  const sorted_csat = [...tlF].sort((a,b) => b.csat - a.csat);
+  const sorted_aht  = [...tlF].sort((a,b) => a.aht - b.aht);
+  const sorted_qa   = [...withQA].sort((a,b) => b.qa - a.qa);
+
+  const topCSAT  = sorted_csat[0];
+  const lowCSAT  = sorted_csat[sorted_csat.length - 1];
+  const topQA    = sorted_qa.length  ? sorted_qa[0]  : null;
+  const lowQA    = sorted_qa.length  ? sorted_qa[sorted_qa.length - 1] : null;
+
+  // CSAT trend check (weeks 18–22)
+  const csatTrend = WEEKLY.csat_pct;
+  const csatDelta = csatTrend[csatTrend.length-1] - csatTrend[0];
+  const csatTrendText = csatDelta > 0
+    ? `improving (+${csatDelta.toFixed(1)}pp from Week 18 to Week 22)`
+    : `declining (${csatDelta.toFixed(1)}pp from Week 18 to Week 22)`;
+
+  // At-risk TL: lowest CSAT + highest AHT
+  let atRisk = null;
+  let riskScore = -Infinity;
+  tlF.forEach(t => {
+    const score = (100 - t.csat) + (t.aht - 420) / 10;
+    if (score > riskScore) { riskScore = score; atRisk = t; }
+  });
+
+  // Week with biggest volume
+  const maxVol = Math.max(...WEEKLY.volume);
+  const maxVolWeek = WEEKLY.labels[WEEKLY.volume.indexOf(maxVol)];
+
+  // QA spread
+  const qaScores = withQA.map(t => t.qa);
+  const qaSpread = qaScores.length ? (Math.max(...qaScores) - Math.min(...qaScores)).toFixed(2) : 0;
+
+  const insights = [
+    `<strong>${topCSAT.tl}</strong> leads in CSAT with <strong>${topCSAT.csat.toFixed(2)}%</strong>, achieving this while maintaining an AHT of <strong>${topCSAT.aht.toFixed(1)} s</strong> — ${topCSAT.aht < 420 ? 'below' : 'above'} the 420 s target.`,
+
+    `Tenured agents outperform Non Tenure agents in CSAT by <strong>6.6 percentage points</strong> (74.5% vs 67.9%) and handle tickets <strong>43 s faster</strong> on average (408 s vs 451 s AHT).`,
+
+    `CSAT is currently <strong>${csatTrendText}</strong>. The peak was Week 21 at 72.1%, suggesting mid-month performance improvements that softened in Week 22.`,
+
+    atRisk ? `<strong>${atRisk.tl}</strong> (${atRisk.spv}) is the highest-risk TL, combining a below-average CSAT of <strong>${atRisk.csat.toFixed(2)}%</strong> with one of the highest AHTs at <strong>${atRisk.aht.toFixed(1)} s</strong> — requiring immediate coaching focus.` : 'All filtered TLs are within acceptable risk boundaries.',
+
+    topQA && lowQA ? `QA scores span <strong>${qaSpread} pp</strong> across TLs — from a high of <strong>${topQA.qa.toFixed(2)}%</strong> (${topQA.tl}) down to <strong>${lowQA.qa.toFixed(2)}%</strong> (${lowQA.tl}). ${lowQA.qa < 95 ? `${lowQA.tl} is below the 95% floor and needs targeted quality intervention.` : 'All audited TLs remain above the 95% operational threshold.'}` : 'QA data is not available for the current filter selection.',
+
+    `<strong>${maxVolWeek}</strong> was the busiest week with <strong>${maxVol.toLocaleString()} tickets</strong> handled — a <strong>${((maxVol - Math.min(...WEEKLY.volume)) / Math.min(...WEEKLY.volume) * 100).toFixed(1)}%</strong> spike above the lowest week. Capacity planning should account for similar mid-month surges in future months.`,
+  ];
+
+  document.getElementById('insights-list').innerHTML = insights
+    .map(text => `<li><div class="insight-bullet"></div><span>${text}</span></li>`)
+    .join('');
+}
+
+/* =======================================================
+   TL SELECTION HIGHLIGHT
+   ======================================================= */
+function selectTL(tl) {
+  selectedTL = selectedTL === tl ? null : tl;
+  updateTLBadge();
+  highlightTL();
+}
+
+function clearTLSelection() {
+  selectedTL = null;
+  updateTLBadge();
+  highlightTL();
+}
+
+function updateTLBadge() {
+  const badge = document.getElementById('tl-badge');
+  if (selectedTL) {
+    badge.classList.add('visible');
+    document.getElementById('tl-badge-name').textContent = selectedTL.split(' ').slice(0,2).join(' ');
+  } else {
+    badge.classList.remove('visible');
+  }
+}
+
+function highlightTL() {
+  // Dim/highlight chart 4 (TL CSAT)
+  if (charts.c4) {
+    const sorted = [...getFilteredTL()].sort((a,b) => b.csat - a.csat);
+    charts.c4.data.datasets[0].backgroundColor = sorted.map(t => {
+      const base = csatColor(t.csat) + 'CC';
+      if (!selectedTL) return base;
+      return t.tl === selectedTL ? csatColor(t.csat) : csatColor(t.csat) + '33';
+    });
+    charts.c4.update('none');
+  }
+
+  if (charts.c5) {
+    const sorted = [...getFilteredTL()].sort((a,b) => a.aht - b.aht);
+    const TARGET_AHT = 420;
+    charts.c5.data.datasets[0].backgroundColor = sorted.map(t => {
+      const base = t.aht > TARGET_AHT ? 'rgba(231,76,60,0.7)' : 'rgba(58,134,255,0.7)';
+      if (!selectedTL) return base;
+      return t.tl === selectedTL ? base : (t.aht > TARGET_AHT ? 'rgba(231,76,60,0.2)' : 'rgba(58,134,255,0.2)');
+    });
+    charts.c5.update('none');
+  }
+
+  if (charts.c8) {
+    const tlF = getFilteredTL();
+    charts.c8.data.datasets[0].pointRadius = tlF.map(t =>
+      !selectedTL || t.tl === selectedTL ? 9 : 5
+    );
+    charts.c8.data.datasets[0].pointBackgroundColor = tlF.map(t => {
+      const base = csatColor(t.csat) + 'BB';
+      if (!selectedTL) return base;
+      return t.tl === selectedTL ? csatColor(t.csat) : csatColor(t.csat) + '33';
+    });
+    charts.c8.update('none');
+  }
+}
+
+/* =======================================================
+   FILTER HANDLERS
+   ======================================================= */
+function resetFilters() {
+  filterState.spv    = 'all';
+  filterState.tenure = 'all';
+  filterState.week   = 'all';
+  selectedTL = null;
+  document.getElementById('filter-spv').value    = 'all';
+  document.getElementById('filter-tenure').value = 'all';
+  document.getElementById('filter-week').value   = 'all';
+  updateTLBadge();
+  applyFilters();
+}
+
+function applyFilters() {
+  updateKPIs();
+  rebuildAllCharts();
+  renderInsights();
+}
+
+/* =======================================================
+   CHART REBUILD
+   ======================================================= */
+function destroyChart(key) {
+  if (charts[key]) { charts[key].destroy(); charts[key] = null; }
+}
+
+function rebuildAllCharts() {
+  destroyChart('c1');  buildChart1();
+  destroyChart('c2');  buildChart2();
+  destroyChart('c3');  buildChart3();
+  destroyChart('c4');  buildChart4();
+  destroyChart('c5');  buildChart5();
+  destroyChart('c6');  buildChart6();
+  destroyChart('c7');  buildChart7();
+  destroyChart('c8');  buildChart8();
+  destroyChart('c9');  buildChart9();
+  destroyChart('c10'); buildChart10();
+  destroyChart('c11'); buildChart11();
+  destroyChart('c12'); buildChart12();
+}
+
+/* =======================================================
+   EVENT LISTENERS
+   ======================================================= */
+document.getElementById('filter-spv').addEventListener('change', function() {
+  filterState.spv = this.value;
+  selectedTL = null; updateTLBadge();
+  applyFilters();
+});
+
+document.getElementById('filter-tenure').addEventListener('change', function() {
+  filterState.tenure = this.value;
+  applyFilters();
+});
+
+document.getElementById('filter-week').addEventListener('change', function() {
+  filterState.week = this.value;
+  applyFilters();
+});
+
+/* =======================================================
+   INIT
+   ======================================================= */
+document.addEventListener('DOMContentLoaded', function() {
+  // Register annotation plugin if available
+  if (window['chartjs-plugin-annotation']) {
+    Chart.register(window['chartjs-plugin-annotation']);
+  }
+
+  // Set Chart.js global defaults
+  Chart.defaults.font.family = 'Inter';
+  Chart.defaults.color = '#6B7280';
+
+  updateKPIs();
+  rebuildAllCharts();
+  renderInsights();
+});
+</script>
+</body>
+</html>
